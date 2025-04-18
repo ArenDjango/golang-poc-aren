@@ -2,6 +2,7 @@ package domain
 
 import entity "user-management/internal/user-management/domain/entities"
 
+
 type IUserRepository interface {
 	Create(user entity.User) (int64, error)
 	GetAll() ([]entity.User, error)

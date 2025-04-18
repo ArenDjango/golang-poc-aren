@@ -3,3 +3,6 @@ create_mocks:
 
 linter:
 	golangci-lint run internal/... --timeout 5m
+
+tests:
+	go test ./...

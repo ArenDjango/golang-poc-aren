@@ -72,8 +72,9 @@ var httpCommand = &cli.Command{
 		}
 		defer app.Stop()
 
+		apiClient := service.NewIPInfoClient(app.Config().UserGeoApiToken)
 		repo := repository.NewUserRepository(app.DB())
-		userService := service.NewUserService(repo, app.Config().UserGeoApiToken)
+		userService := service.NewUserService(repo, apiClient)
 		controller := controller.NewController(userService)
 
 		// create http router

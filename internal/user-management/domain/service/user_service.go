@@ -1,11 +1,10 @@
 package service
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
 	"user-management/internal/user-management/domain"
 	entity "user-management/internal/user-management/domain/entities"
+
+	"github.com/rs/zerolog/log"
 )
 
 type IUserService interface {
@@ -17,21 +16,26 @@ type IUserService interface {
 }
 
 type userService struct {
-	repo            domain.IUserRepository
-	userGeoApiToken string
+	repo         domain.IUserRepository
+	ipInfoClient IPInfoClient
 }
 
-func NewUserService(r domain.IUserRepository, userGeoApiToken string) IUserService {
-	return &userService{repo: r, userGeoApiToken: userGeoApiToken}
+func NewUserService(r domain.IUserRepository, ipInfoClient IPInfoClient) IUserService {
+	return &userService{repo: r, ipInfoClient: ipInfoClient}
 }
 
 func (s *userService) RegisterUser(user entity.User, ip string) (map[string]interface{}, error) {
-	ipInfo, err := s.getIPInfo(ip)
-	if err == nil {
-		fmt.Print("ipinfo", ipInfo)
-		// user.Metadata["location"] = ipInfo
+	ipInfo, err := s.ipInfoClient.GetInfo(ip)
+	if err != nil {
+		log.Error().Msgf("RegisterUser error getting Geo API")
+		ipInfo = map[string]interface{}{
+			"Couldn't call the geo API": "true",
+		}
 	}
 	id, err := s.repo.Create(user)
+	if err != nil {
+		return map[string]interface{}{}, err
+	}
 	ipInfo["usedId"] = id
 	return ipInfo, nil
 }
@@ -50,20 +54,4 @@ func (s *userService) UpdateUser(user entity.User) error {
 
 func (s *userService) DeleteUser(id int64) error {
 	return s.repo.Delete(id)
-}
-
-func (s *userService) getIPInfo(ip string) (map[string]interface{}, error) {
-	url := fmt.Sprintf("https://ipinfo.io/%s?token=%s", ip, s.userGeoApiToken)
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Print(resp)
-	defer resp.Body.Close()
-
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-	return result, nil
 }
