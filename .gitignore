@@ -1,0 +1,7 @@
+.idea
+.env
+bin
+/vendor
+/var
+.DS_Store
+.git/*

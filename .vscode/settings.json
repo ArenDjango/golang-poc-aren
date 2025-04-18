@@ -1,0 +1,19 @@
+{
+    "makefile.configureOnOpen": false,
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "MySQL",
+            "name": "test",
+            "group": "test",
+            "database": "mysql",
+            "username": "mysql",
+            "connectString": "mysql://mysql:mysql@localhost:3306/user-management"
+        }
+    ]
+}

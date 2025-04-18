@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  database:
+    container_name: mysql
+    image: mysql:8.0
+    restart: always
+    platform: linux/amd64
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: user-management
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: mysql
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-hmysql", "-pmysql"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
