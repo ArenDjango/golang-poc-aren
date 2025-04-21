@@ -62,7 +62,6 @@ var httpCommand = &cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		// read config from env
 		_, app, err := app.Start(c.Context, "service", c.String("env"))
 		if err != nil {
 			return err
@@ -77,7 +76,6 @@ var httpCommand = &cli.Command{
 		userService := service.NewUserService(repo, apiClient)
 		controller := controller.NewController(userService)
 
-		// create http router
 		router := mux.NewRouter()
 		router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 		router.HandleFunc("/users", controller.CreateUser).Methods("POST")
@@ -103,6 +101,8 @@ var httpCommand = &cli.Command{
 		<-quit
 
 		log.Info().Msg("Shutdown signal received, stopping services...")
+
+		app.Stop()
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
